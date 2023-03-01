@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <functional>
 #include <vector>
 #include "KvContainer.h"
 
@@ -43,15 +44,26 @@ namespace kvstore {
     template<class KEY, class VALUE>
     class SkipList: public KvContainer<KEY, VALUE> {
     public:
-        using NodePtr = Node<KEY, VALUE>;
 
-        SkipList();
+        using NodePtr = Node<KEY, VALUE>*;
 
-        ~SkipList();
+        using Comparator = std::function<int(const KEY&, const KEY&)>;
+
+        enum CompareCode {
+
+        };
+
+        explicit SkipList(Comparator comparator);
+
+        ~SkipList() = default;
+
+        SkipList(const SkipList &skipList) = delete;
+
+        SkipList& operator=(const SkipList &skipList) = delete;
 
         bool Put(const KEY &key, const VALUE & value) override;
 
-        VALUE * Get(const KEY &key) override;
+        VALUE * Get(const KEY &key) const override;
 
         bool Delete(const KEY &key) override;
 
@@ -59,14 +71,38 @@ namespace kvstore {
             return SKIPLIST_CTYPE;
         }
 
+        int GetCurrHeight() const {
+            return curr_height_;
+        }
+
     private:
         static constexpr uint8_t kMaxHeight = 12;
 
-        NodePtr header_;
-        uint8_t curr_height_{1};
+        bool Equal(const KEY &a, const KEY &b) const {
+            assert(compare_);
+            return compare_(a, b) == 0;
+        }
+
+        bool Less(const KEY &a, const KEY &b) const {
+            assert(compare_);
+            return compare_(a, b) < 0;
+        }
+
+        bool GreaterOrEqual(const KEY &a, const KEY &b) const {
+            assert(compare_);
+            return compare_(a, b) >= 0;
+        }
+
+        NodePtr FindGreaterOrEqual(const KEY& key) const;
+
+        NodePtr FindLessThan(const KEY& key) const;
+
+        NodePtr FindLast() const;
+
+        NodePtr header_{nullptr};
+        Comparator compare_;
+        int curr_height_{1};
     };
-
-
 
 }
 
