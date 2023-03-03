@@ -9,6 +9,7 @@
 #include <iostream>
 #include <functional>
 #include <vector>
+#include "Utils.h"
 #include "KvContainer.h"
 
 namespace kvstore {
@@ -76,7 +77,12 @@ namespace kvstore {
         }
 
     private:
+
         static constexpr uint8_t kMaxHeight = 12;
+
+        static constexpr int RandomMin = 0;
+
+        static constexpr int RandomMax = 3;
 
         bool Equal(const KEY &a, const KEY &b) const {
             assert(compare_);
@@ -101,6 +107,7 @@ namespace kvstore {
 
         NodePtr header_{nullptr};
         Comparator compare_;
+        Random random_;
         int curr_height_{1};
     };
 

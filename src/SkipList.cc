@@ -6,7 +6,7 @@ using namespace kvstore;
 
 template<class KEY, class VALUE>
 SkipList<KEY, VALUE>::SkipList(Comparator comparator):
-    compare_(std::move(comparator)){}
+    compare_(std::move(comparator)), random_(RandomMin, RandomMax) {}
 
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
@@ -20,7 +20,11 @@ bool SkipList<KEY, VALUE>::Delete(const KEY &key) {
 
 template<class KEY, class VALUE>
 VALUE *SkipList<KEY, VALUE>::Get(const KEY &key) const {
-
+    auto findnode = FindGreaterOrEqual(key);
+    if (findnode && Equal(findnode->key_, key)) {
+        return findnode->value_;
+    }
+    return nullptr;
 }
 
 template<class KEY, class VALUE>

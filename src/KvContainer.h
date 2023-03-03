@@ -10,6 +10,7 @@ namespace kvstore {
     enum ContainType {
         HASH_CTYPE,
         SKIPLIST_CTYPE,
+        BPLUSTREE_CTYPE,
         NOTVALID_CTYPE,
     };
 
@@ -32,7 +33,6 @@ namespace kvstore {
 
     private:
     };
-
 
 }
 
