@@ -17,7 +17,7 @@ namespace kvstore {
 
         bool Put(const KEY &key, const VALUE &value) override;
 
-        VALUE* Get(const KEY &key) override;
+        bool Get(const KEY &key, VALUE *value) override;
 
         bool Delete(const KEY &key) override;
 

@@ -54,9 +54,21 @@ namespace kvstore {
 
         };
 
-        explicit SkipList(Comparator comparator);
+        explicit SkipList(Comparator comparator):
+                compare_(std::move(comparator)), random_(RandomMin, RandomMax) {
+                for (int i = 0; i < kMaxHeight; ++i) {
+                    header_->SetNext(i, nullptr);
+                }
+        }
 
-        ~SkipList() = default;
+        ~SkipList() {     // 释放内存
+            NodePtr curr_node = header_;
+            while (curr_node) {
+                auto next_node = curr_node->GetNext(0);
+                delete curr_node;
+                curr_node = next_node;
+            }
+        }
 
         SkipList(const SkipList &skipList) = delete;
 
@@ -64,9 +76,11 @@ namespace kvstore {
 
         bool Put(const KEY &key, const VALUE & value) override;
 
-        VALUE *Get(const KEY &key) const override;
+        bool Get(const KEY &key, VALUE *value) const override;
 
         bool Delete(const KEY &key) override;
+
+        void Dump() override;
 
         ContainType GetType() override {
             return SKIPLIST_CTYPE;

@@ -23,7 +23,7 @@ namespace kvstore {
 
         virtual bool Put(const KEY &key, const VALUE & value) = 0;
 
-        virtual VALUE* Get(const KEY &key) const = 0;
+        virtual bool Get(const KEY &key, VALUE *value) const = 0;
 
         virtual bool Delete(const KEY &key) = 0;
 

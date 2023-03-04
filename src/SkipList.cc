@@ -5,10 +5,6 @@
 using namespace kvstore;
 
 template<class KEY, class VALUE>
-SkipList<KEY, VALUE>::SkipList(Comparator comparator):
-    compare_(std::move(comparator)), random_(RandomMin, RandomMax) {}
-
-template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
     int newheight = GetRandomHeight();
 
@@ -24,7 +20,7 @@ bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
         curr_height_ = newheight;
     }
     // 创建一个新结点
-    auto newnode = new Node<KEY, VALUE>(key, value);
+    auto newnode = new Node<KEY, VALUE>(key, value, kMaxHeight);
     for (int i = 0; i < newheight; ++i) {
         newnode->SetNext(i, prenodes[i]->GetNext(i));
         prenodes[i]->SetNext(i, newnode);
@@ -39,12 +35,18 @@ bool SkipList<KEY, VALUE>::Delete(const KEY &key) {
 }
 
 template<class KEY, class VALUE>
-VALUE *SkipList<KEY, VALUE>::Get(const KEY &key) const {
-    auto findnode = FindGreaterOrEqual(key);
+void SkipList<KEY, VALUE>::Dump() {
+
+}
+
+template<class KEY, class VALUE>
+bool SkipList<KEY, VALUE>::Get(const KEY &key, VALUE *value) const {
+    auto findnode = FindGreaterOrEqual(key, nullptr);
     if (findnode && Equal(findnode->key_, key)) {
-        return findnode->value_;
+        *value = findnode->value_;
+        return true;
     }
-    return nullptr;
+    return false;
 }
 
 template<class KEY, class VALUE>
@@ -58,7 +60,7 @@ Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key, std::v
             curr_node = next_node;
         } else {        // 如果next是空的，或者大于等于key，就往下降一层，不过此时curr还是小于key的
             if (prenodes) {
-                *prenodes[curr_level] = curr_node;
+                prenodes->assign(curr_level, curr_node);
             }
             if (curr_level == 0) {
                 return next_node;
