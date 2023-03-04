@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(SRC
         src/SkipList.cc
-        src/BPlusTree.cc)
+        src/BPlusTree.cc src/BPlusTreePredefined.h)
 
 set(CXX_FLAGS
         -g
