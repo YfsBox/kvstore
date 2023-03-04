@@ -18,11 +18,15 @@ namespace kvstore {
     struct Node {
         using NodePtr = Node*;
 
-        const KEY key_;
+        const KEY key_{0};
 
-        VALUE value_;
+        VALUE value_{0};
 
         Node(const KEY &key, const VALUE &value, int level): key_(key), value_(value) {
+            nexts_.reserve(level);
+        }
+
+        explicit Node(int level) {
             nexts_.reserve(level);
         }
 
@@ -36,6 +40,10 @@ namespace kvstore {
         void SetNext(int n, const NodePtr node) {
             assert(n >= 0);
             nexts_[n] = node;
+        }
+
+        void ResizeNext(int n) {
+            nexts_.resize(n, nullptr);
         }
 
     private:
@@ -56,6 +64,8 @@ namespace kvstore {
 
         explicit SkipList(Comparator comparator):
                 compare_(std::move(comparator)), random_(RandomMin, RandomMax) {
+                header_ = new Node<KEY, VALUE>(kMaxHeight);
+                header_->ResizeNext(kMaxHeight);
                 for (int i = 0; i < kMaxHeight; ++i) {
                     header_->SetNext(i, nullptr);
                 }

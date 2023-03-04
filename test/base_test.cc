@@ -28,7 +28,23 @@ TEST(RANDOM_TEST, BASE_RANDOM_TEST) {
 
 }
 
-TEST(PUTANDGET_TEST, BASE_TEST) {
+TEST(PUTANDGET_TEST, SIMPLE_TEST) {
+    auto compare = [](const int &a,const int &b) ->int {
+        if (a < b) {
+            return -1;
+        } else if (a == b) {
+            return 0;
+        } else {
+            return 1;
+        }
+    };
+    auto sklist = std::make_unique<SkipList<int, int>>(compare);
+    sklist->Put(1, 1);
+    sklist->Put(2, 2);
+
+}
+
+TEST(PUTANDGET_TEST, MUTI_TEST) {
 
     auto compare = [](const std::string &a,const std::string &b) ->int {
         if (a < b) {
@@ -44,7 +60,7 @@ TEST(PUTANDGET_TEST, BASE_TEST) {
     // auto sklist = std::make_unique<SkipList<std::string, std::string>>();
     auto sklist = std::make_unique<SkipList<std::string , std::string>>(compare);
     // insert numbers
-    /*std::vector<int> numbers;
+    std::vector<int> numbers;
 
     for (int i = 0; i < 10000; ++i) {
         auto number = random_gene.GetRandom();
@@ -56,7 +72,7 @@ TEST(PUTANDGET_TEST, BASE_TEST) {
         std::string value;
         ASSERT_TRUE(sklist->Get(std::to_string(num), &value));
         ASSERT_TRUE(value == std::to_string(num));
-    }*/
+    }
 
 }
 

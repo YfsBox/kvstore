@@ -7,7 +7,7 @@ using namespace kvstore;
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
     int newheight = GetRandomHeight();
-
+    // printf("The newh is %d\n", newheight);
     std::vector<NodePtr> prenodes;
     prenodes.resize(kMaxHeight, nullptr);
 
@@ -60,7 +60,7 @@ Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key, std::v
             curr_node = next_node;
         } else {        // 如果next是空的，或者大于等于key，就往下降一层，不过此时curr还是小于key的
             if (prenodes) {
-                prenodes->assign(curr_level, curr_node);
+                (*prenodes)[curr_level] = curr_node;
             }
             if (curr_level == 0) {
                 return next_node;
