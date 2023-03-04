@@ -7,11 +7,11 @@ using namespace kvstore;
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
     int newheight = GetRandomHeight();
-    // printf("The newh is %d\n", newheight);
+
     std::vector<NodePtr> prenodes;
     prenodes.resize(kMaxHeight, nullptr);
 
-    auto node = FindGreaterOrEqual(key, &prenodes);
+    auto newnode = FindGreaterOrEqual(key, &prenodes);
 
     if (newheight > curr_height_) {     // 需要更新最大高度
         for (int i = curr_height_; i < newheight; ++i) {
@@ -20,7 +20,7 @@ bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
         curr_height_ = newheight;
     }
     // 创建一个新结点
-    auto newnode = new Node<KEY, VALUE>(key, value, kMaxHeight);
+    newnode = new Node<KEY, VALUE>(key, value, kMaxHeight);
     for (int i = 0; i < newheight; ++i) {
         newnode->SetNext(i, prenodes[i]->GetNext(i));
         prenodes[i]->SetNext(i, newnode);

@@ -22,8 +22,8 @@ bool BPlusTree<KEY, VALUE>::Delete(const KEY &key) {
 }
 
 template<class KEY, class VALUE>
-VALUE *BPlusTree<KEY, VALUE>::Get(const KEY &key) const {
-    return nullptr;
+bool BPlusTree<KEY, VALUE>::Get(const KEY &key, VALUE *value) const {
+    return false;
 }
 
 
