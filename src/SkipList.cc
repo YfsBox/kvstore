@@ -10,12 +10,32 @@ SkipList<KEY, VALUE>::SkipList(Comparator comparator):
 
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
+    int newheight = GetRandomHeight();
 
+    std::vector<NodePtr> prenodes;
+    prenodes.resize(kMaxHeight, nullptr);
+
+    auto node = FindGreaterOrEqual(key, &prenodes);
+
+    if (newheight > curr_height_) {     // 需要更新最大高度
+        for (int i = curr_height_; i < newheight; ++i) {
+            prenodes[i] = header_;
+        }
+        curr_height_ = newheight;
+    }
+    // 创建一个新结点
+    auto newnode = new Node<KEY, VALUE>(key, value);
+    for (int i = 0; i < newheight; ++i) {
+        newnode->SetNext(i, prenodes[i]->GetNext(i));
+        prenodes[i]->SetNext(i, newnode);
+    }
+
+    return true;
 }
 
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Delete(const KEY &key) {
-
+    return false;
 }
 
 template<class KEY, class VALUE>
@@ -28,7 +48,7 @@ VALUE *SkipList<KEY, VALUE>::Get(const KEY &key) const {
 }
 
 template<class KEY, class VALUE>
-Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key) const {
+Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key, std::vector<NodePtr> *prenodes) const {
     auto curr_node = header_;
     int curr_level = curr_height_ - 1;
 
@@ -36,13 +56,25 @@ Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key) const 
         auto next_node = curr_node->GetNext(curr_level);
         if (next_node && Less(next_node->key_, key)) {
             curr_node = next_node;
-        } else {
+        } else {        // 如果next是空的，或者大于等于key，就往下降一层，不过此时curr还是小于key的
+            if (prenodes) {
+                *prenodes[curr_level] = curr_node;
+            }
             if (curr_level == 0) {
-                return curr_node;
+                return next_node;
             }
             --curr_level;
         }
     }
+}
+
+template<class KEY, class VALUE>
+int SkipList<KEY, VALUE>::GetRandomHeight() {
+    int height = 1;
+    while (height < kMaxHeight && random_.GetRandom() == 0) {
+        height++;
+    }
+    return height;
 }
 
 template<class KEY, class VALUE>

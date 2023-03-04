@@ -64,7 +64,7 @@ namespace kvstore {
 
         bool Put(const KEY &key, const VALUE & value) override;
 
-        VALUE * Get(const KEY &key) const override;
+        VALUE *Get(const KEY &key) const override;
 
         bool Delete(const KEY &key) override;
 
@@ -99,7 +99,9 @@ namespace kvstore {
             return compare_(a, b) >= 0;
         }
 
-        NodePtr FindGreaterOrEqual(const KEY& key) const;
+        int GetRandomHeight();
+
+        NodePtr FindGreaterOrEqual(const KEY& key, std::vector<NodePtr> *prenodes) const;
 
         NodePtr FindLessThan(const KEY& key) const;
 
