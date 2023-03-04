@@ -4,7 +4,8 @@ project(kvstore)
 set(CMAKE_CXX_STANDARD 14)
 
 set(LIB_SRC
-        src/SkipList.cc)
+        src/SkipList.cc
+        src/BPlusTree.cc)
 
 set(CXX_FLAGS
         -g
