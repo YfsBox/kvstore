@@ -46,6 +46,10 @@ namespace kvstore {
             nexts_.resize(n, nullptr);
         }
 
+        int GetNextSize() const {
+            return nexts_.size();
+        }
+
     private:
         std::vector<NodePtr> nexts_;
     };

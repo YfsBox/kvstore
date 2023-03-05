@@ -6,13 +6,18 @@ using namespace kvstore;
 
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
-    int newheight = GetRandomHeight();
 
     std::vector<NodePtr> prenodes;
     prenodes.resize(kMaxHeight, nullptr);
 
     auto newnode = FindGreaterOrEqual(key, &prenodes);
 
+    if (newnode != nullptr && Equal(newnode->key_, key)) {      // 该key已经存在
+        newnode->value_ = value;
+        return true;
+    }
+
+    int newheight = GetRandomHeight();
     if (newheight > curr_height_) {     // 需要更新最大高度
         for (int i = curr_height_; i < newheight; ++i) {
             prenodes[i] = header_;
@@ -21,6 +26,8 @@ bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
     }
     // 创建一个新结点
     newnode = new Node<KEY, VALUE>(key, value, kMaxHeight);
+    newnode->ResizeNext(newheight);
+
     for (int i = 0; i < newheight; ++i) {
         newnode->SetNext(i, prenodes[i]->GetNext(i));
         prenodes[i]->SetNext(i, newnode);
@@ -36,7 +43,20 @@ bool SkipList<KEY, VALUE>::Delete(const KEY &key) {
 
 template<class KEY, class VALUE>
 void SkipList<KEY, VALUE>::Dump() {
-
+    // 首先打印header
+    for (int i = 0; i < kMaxHeight; ++i) {
+        std::cout << "header,";
+    }
+    std::cout << '\n';
+    auto curr_node = header_->GetNext(0);
+    while (curr_node) {
+        int next_len = curr_node->GetNextSize();
+        for (int i = 0; i < next_len; ++i) {
+            std::cout << curr_node->key_ << ',';
+        }
+        std::cout << '\n';
+        curr_node = curr_node->GetNext(0);
+    }
 }
 
 template<class KEY, class VALUE>

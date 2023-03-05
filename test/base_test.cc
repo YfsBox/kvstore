@@ -41,7 +41,8 @@ TEST(PUTANDGET_TEST, SIMPLE_TEST) {
     auto sklist = std::make_unique<SkipList<int, int>>(compare);
     sklist->Put(1, 1);
     sklist->Put(2, 2);
-
+    sklist->Put(4, 1);
+    sklist->Dump();
 }
 
 TEST(PUTANDGET_TEST, MUTI_TEST) {
@@ -55,18 +56,19 @@ TEST(PUTANDGET_TEST, MUTI_TEST) {
             return 1;
         }
     };
-
-    Random random_gene(0, 10000);
+    const int max_range = 20;
+    Random random_gene(0, max_range);
     // auto sklist = std::make_unique<SkipList<std::string, std::string>>();
     auto sklist = std::make_unique<SkipList<std::string , std::string>>(compare);
     // insert numbers
     std::vector<int> numbers;
 
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < max_range; ++i) {
         auto number = random_gene.GetRandom();
         numbers.push_back(number);
         sklist->Put(std::to_string(number), std::to_string(number));
     }
+    sklist->Dump();
     // 检查是否插入成功
     for (auto num : numbers) {
         std::string value;
