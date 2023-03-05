@@ -11,6 +11,7 @@ namespace kvstore {
         HASH_CTYPE,
         SKIPLIST_CTYPE,
         BPLUSTREE_CTYPE,
+        OTHER_CTYPE,
         NOTVALID_CTYPE,
     };
 

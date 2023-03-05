@@ -129,7 +129,7 @@ namespace kvstore {
 
         int GetRandomHeight();
 
-        NodePtr FindGreaterOrEqual(const KEY& key, std::vector<NodePtr> *prenodes) const;
+        NodePtr FindGreaterOrEqual(const KEY& key, NodePtr *prenodes) const;
 
         NodePtr FindLessThan(const KEY& key) const;
 

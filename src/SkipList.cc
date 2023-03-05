@@ -7,11 +7,9 @@ using namespace kvstore;
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
 
-    std::vector<NodePtr> prenodes;
-    prenodes.resize(kMaxHeight, nullptr);
+    NodePtr prenodes[kMaxHeight] = {nullptr};
 
-    auto newnode = FindGreaterOrEqual(key, &prenodes);
-
+    auto newnode = FindGreaterOrEqual(key, prenodes);
     if (newnode != nullptr && Equal(newnode->key_, key)) {      // 该key已经存在
         newnode->value_ = value;
         return true;
@@ -38,7 +36,23 @@ bool SkipList<KEY, VALUE>::Put(const KEY &key, const VALUE &value) {
 
 template<class KEY, class VALUE>
 bool SkipList<KEY, VALUE>::Delete(const KEY &key) {
-    return false;
+    NodePtr prenodes[kMaxHeight] = {nullptr};
+    auto findnode = FindGreaterOrEqual(key, prenodes);
+    if (findnode == nullptr || !Equal(findnode->key_, key)) {
+        return false;       // 不存在，也就不删除
+    }
+
+    for (int i = kMaxHeight - 1; i >= 0; --i) {
+        if (prenodes[i] && prenodes[i]->GetNext(i) == findnode) {
+           prenodes[i]->SetNext(i, findnode->GetNext(i));
+        }
+    }
+    delete findnode;
+
+    while (curr_height_ > 1 && !header_->GetNext(curr_height_ - 1)) {
+        --curr_height_;
+    }
+    return true;
 }
 
 template<class KEY, class VALUE>
@@ -70,7 +84,7 @@ bool SkipList<KEY, VALUE>::Get(const KEY &key, VALUE *value) const {
 }
 
 template<class KEY, class VALUE>
-Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key, std::vector<NodePtr> *prenodes) const {
+Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key, NodePtr *prenodes) const {
     auto curr_node = header_;
     int curr_level = curr_height_ - 1;
 
@@ -80,7 +94,7 @@ Node<KEY,VALUE>* SkipList<KEY, VALUE>::FindGreaterOrEqual(const KEY &key, std::v
             curr_node = next_node;
         } else {        // 如果next是空的，或者大于等于key，就往下降一层，不过此时curr还是小于key的
             if (prenodes) {
-                (*prenodes)[curr_level] = curr_node;
+                prenodes[curr_level] = curr_node;
             }
             if (curr_level == 0) {
                 return next_node;
