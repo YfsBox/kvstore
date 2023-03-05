@@ -20,7 +20,7 @@ namespace kvstore {
 
     //B+树的元信息
     typedef struct {
-        //B+树的排序规则
+        //B+树的阶
         size_t order;
         //value的大小
         size_t value_size;
@@ -40,22 +40,19 @@ namespace kvstore {
         off_t leaf_offset;
     } meta_t;
 
-    //内部节点的元素key-offset
+    //中间节点的元素key-offset
     struct index_t {
         key_t key;
         off_t child;
     };
 
-    //内部节点
+    //中间节点
     struct internal_node_t {
         typedef index_t *child_t;
-        //父节点的offset
         off_t parent;
-        //下一个节点的偏移
         off_t next;
-        //上一个节点的偏移
         off_t prev;
-        //子节点的个数
+        //中间节点保存的元素个数
         size_t n;
         //内部节点中保存的key-offset
         index_t children[BP_ORDER];
@@ -72,7 +69,9 @@ namespace kvstore {
         typedef record_t *child_t;
         //父节点的位置
         off_t parent;
+        //下一个节点
         off_t next;
+        //上一个节点
         off_t prev;
         //叶子结点保存的record的个数
         size_t n;
