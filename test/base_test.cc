@@ -298,8 +298,42 @@ TEST(SKLIST_TEST, COMPARE_WITH_OTHERS) {
     }
     printf("The binary search cost is %lf\n", bskv_cost);
 
-
 }
+
+TEST(SKLIST_TEST, ITERATOR_TEST) {
+
+    const int max_range = 5000;
+    const int max_count = 5000;
+    Random random_gene(0, max_range);
+    // auto sklist = std::make_unique<SkipList<int, int>>(CompareInt);
+    SkipList<int, int> sklist(CompareInt);
+    SkipListIterator<int, int> sklistIt(sklist);
+    // 插入数值
+    std::unordered_set<int> insert_keys;
+    while (insert_keys.size() != max_count) {
+        auto random_number = random_gene.GetRandom();
+        if (!insert_keys.count(random_number)) {
+            sklist.Put(random_number, random_number);
+            insert_keys.insert(random_number);
+        }
+    }
+    // 利用迭代器遍历，检查是否递增，并且数量足够
+    sklistIt.Init();
+    SkipListIterator<int, int>::ConstNodePtr pre_node = nullptr;
+    size_t it_node_cnt = 0;
+    while (sklistIt.HasNext()) {
+        auto curr_node = sklistIt.Next();
+        ASSERT_TRUE(insert_keys.count(curr_node->key_));
+        if (pre_node) {
+            ASSERT_TRUE(pre_node->key_ < curr_node->key_);
+        }
+        it_node_cnt++;
+        pre_node = curr_node;
+    }
+
+    ASSERT_EQ(it_node_cnt, max_count);
+}
+
 
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc, argv);

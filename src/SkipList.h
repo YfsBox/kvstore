@@ -32,7 +32,7 @@ namespace kvstore {
 
         ~Node() = default;
 
-        NodePtr GetNext(int n) {
+        NodePtr GetNext(int n) const {
             assert(n >= 0);
             return nexts_[n];
         }
@@ -55,8 +55,13 @@ namespace kvstore {
     };
 
     template<class KEY, class VALUE>
+    class SkipListIterator;
+
+    template<class KEY, class VALUE>
     class SkipList: public KvContainer<KEY, VALUE> {
     public:
+
+        friend class SkipListIterator<KEY, VALUE>;
 
         using NodePtr = Node<KEY, VALUE>*;
 
@@ -141,6 +146,37 @@ namespace kvstore {
         int curr_height_{1};
     };
 
+    template<class KEY, class VALUE>
+    class SkipListIterator {
+    public:
+        using ConstNodePtr = const Node<KEY, VALUE>*;
+
+        using ConstSkipList = const SkipList<KEY, VALUE>;
+
+        explicit SkipListIterator(const ConstSkipList &skiplist): skip_list_(skiplist) {}
+
+        void Init() {
+            curr_node_ = skip_list_.header_;
+        }
+
+        bool HasNext() const {
+            if (curr_node_) {
+                return curr_node_->GetNext(0) != nullptr;
+            }       // 如果下一节不是nullptr,那么
+            return false;
+        }
+
+        ConstNodePtr Next() {
+            assert(curr_node_);
+            const auto next_node = curr_node_->GetNext(0);
+            curr_node_ = next_node;
+            return next_node;
+        }
+
+    private:
+        ConstSkipList &skip_list_;
+        ConstNodePtr curr_node_{nullptr};
+    };
 }
 
 
